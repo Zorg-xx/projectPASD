@@ -30,11 +30,11 @@ struct liste_chaine
 
 
 static maillon creer_maillon(void * _val,void (*copier)(void*,void**)){
-  maillon maillon=malloc(sizeof(struct maillon_struct));
-  copier(_val,&(maillon->val));
-  maillon->val=_val;
-  maillon->next=NULL;
-  return maillon;
+  maillon mail=malloc(sizeof(struct maillon_struct));
+  mail->val=NULL;
+  copier(_val,&(mail)->val);
+  mail->next=NULL;
+  return mail;
 }
 
 chaine creer_chaine_init(void (*copier)(void*,void**),int (*val_exist)(void*,void*),void (*detruire)(void**),int (*compare)(void*,void*)){
@@ -51,12 +51,16 @@ chaine creer_chaine_init(void (*copier)(void*,void**),int (*val_exist)(void*,voi
 void insert_val(chaine ch,void* _val){
   maillon mail=creer_maillon(_val,ch->copier);
   maillon courant=ch->racine;
-  while(courant!=NULL)
+  if(courant==NULL){
+    ch->racine=mail;
+    mail->racine=ch->racine;
+  }else{
+  while(courant->next!=NULL)
     courant=courant->next;
-  courant =mail;
-  courant->racine=ch->racine;
+  courant->next=mail;
+  mail->racine=ch->racine;
   ch->rang+=1;
-  
+  }
 }
 /*retourne -1 si le rang de la chaine  de gauche est plus grand
  * retourne 1 si le rang de la chaine de  droite est plus grand
@@ -75,10 +79,12 @@ int compare_taille(chaine chaine1,chaine chaine2){
 static void detruire_maillon_rec(maillon* maillon, void (*detruire)(void ** pt)){
   if((*maillon)!=NULL){
     if((*maillon)->next!=NULL){
-      detruire_maillon_rec(&(*maillon)->next,*detruire);
-    }
+    detruire_maillon_rec(&(*maillon)->next,*detruire);
+    }      
     detruire(&(*maillon)->val);
     detruire((void*) maillon);
+  }else{
+    printf("chaine deja vide");
   }
 }
 
@@ -105,6 +111,7 @@ static void print_maillon(maillon mail,FILE * out, void(*afficher)(void* _val,FI
 void print_chaine(chaine chaine,FILE *out, void(*afficher)(void*_val,FILE *out)){
   assert(chaine!=NULL);
   print_maillon(chaine->racine,out,afficher);
+  fprintf(out, "\n");
 }
 
 /*----------fonction complémentaire pour les test--------------*/
