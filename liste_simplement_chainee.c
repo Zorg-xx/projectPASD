@@ -24,7 +24,8 @@ struct liste_chaine
   maillon racine;
   void (*copier)(void*,void**);
   int (*val_exist)(void*,void*);
-  void (*detruire)(void**);  
+  void (*detruire)(void**);
+  int (*compare)(void*,void*);
 };
 
 
@@ -36,8 +37,12 @@ static maillon creer_maillon(void * _val,void (*copier)(void*,void**)){
   return maillon;
 }
 
-chaine creer_chaine_init(){
+chaine creer_chaine_init(void (*copier)(void*,void**),int (*val_exist)(void*,void*),void (*detruire)(void**),int (*compare)(void*,void*)){
   chaine chaine=malloc(sizeof(struct liste_chaine));
+  chaine->copier=copier;
+  chaine->val_exist=val_exist;
+  chaine->detruire=detruire;
+  chaine->compare=compare;
   chaine->rang=0;
   chaine->racine=NULL;
   return chaine;
@@ -49,6 +54,8 @@ void insert_val(chaine ch,void* _val){
   while(courant!=NULL)
     courant=courant->next;
   courant =mail;
+  courant->racine=ch->racine;
+  ch->rang+=1;
   
 }
 /*retourne -1 si le rang de la chaine  de gauche est plus grand
@@ -75,79 +82,43 @@ static void detruire_maillon_rec(maillon* maillon, void (*detruire)(void ** pt))
   }
 }
 
-void detruire_chaine(chaine* ch){
-  detruire_maillon_rec(&(*ch)->racine,(*ch)->detruire);
-  free((*ch));
-}
-
-/*
-
-void print_chaine(chaine chaine){
-  assert(chaine!=NULL);
-  maillon courant=NULL;
-  courant=chaine->racine;
-  if(courant==NULL){
-    printf("chaine vide\n");
-  }else{
-    printf("rang de la chaine : %d\n",chaine->rang);
-    while(courant!=NULL){
-      printf("%d",courant->val);
-      if((courant=courant->next))
-	printf("->");
-      else printf("\n");
-    }
-  }
-}
-
-void insert_val(chaine chaine,int val){
-  assert(chaine!=NULL);
-  maillon courant = NULL;
-  courant =chaine->racine;
-  if(courant==NULL){
-    chaine->racine=creer_maillon(val);
-    chaine->racine->racine=chaine->racine;
-  }else{
-    while(courant->next!=NULL){
-      courant=courant->next;
-    }
-    chaine->rang+=1;
-    courant->next=creer_maillon(val);
-    courant->next->racine=chaine->racine;
-  }
-}
-
-
-void detruire_chaine(chaine *chaine){
-  assert(chaine!=NULL);
-  detruire_maillon_rec((*chaine)->racine);
-  printf("destruction chaine\n");
-  free(*chaine);
-}
-
-
-int val_exist(chaine chaine,int a){
-  assert(chaine!=NULL);
-  maillon courant=chaine->racine;
-  while(courant!=NULL){
-    if(courant->val==a){
-      return 1;
-    }
-    courant=courant->next;
-  }
-
-  return 0;
-}
-
-void detruire_arbre_simple(chaine *chaine){
+void detruire_chaine_simple(chaine *chaine){
   assert(chaine!=NULL);
   free(*chaine);
   (*chaine)=NULL;
 }
 
+void detruire_chaine(chaine* ch){
+  detruire_maillon_rec(&(*ch)->racine,(*ch)->detruire);
+  detruire_chaine_simple(ch);
+}
+
+static void print_maillon(maillon mail,FILE * out, void(*afficher)(void* _val,FILE * out)){
+  if(mail!=NULL){
+    afficher(mail->val,out);
+    if(mail->next!=NULL){
+      fprintf(out, "->");
+      print_maillon(mail->next,out,afficher);
+    }
+  }
+}
+void print_chaine(chaine chaine,FILE *out, void(*afficher)(void*_val,FILE *out)){
+  assert(chaine!=NULL);
+  print_maillon(chaine->racine,out,afficher);
+}
+
+/*----------fonction complémentaire pour les test--------------*/
+
+void getrang(chaine ch){
+  printf("rang : %d\n",ch->rang);
+}
+
 void isNull(chaine link){
   if(link->racine==NULL)
-    printf("non\n");
+    printf("la chaine est null\n");
 }
+
+
 
 //fusion et destuction du plus petit arbre et renvoi l'arbre fusionné
 chaine fusion_chaine(chaine* ch1, chaine* ch2){
@@ -166,7 +137,7 @@ chaine fusion_chaine(chaine* ch1, chaine* ch2){
       courant1=courant1->next;
       (*ch1)->rang+=1;
     }
-    detruire_arbre_simple(ch2);
+    detruire_chaine_simple(ch2);
     return *ch1;
   }else{
     maillon courant2=(*ch2)->racine;
@@ -179,8 +150,8 @@ chaine fusion_chaine(chaine* ch1, chaine* ch2){
       courant2=courant2->next;
       (*ch2)->rang+=1;
     }
-    detruire_arbre_simple(ch1);
+    detruire_chaine_simple(ch1);
     return *ch2;
     }
 }
-*/
+
