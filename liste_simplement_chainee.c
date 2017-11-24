@@ -23,9 +23,8 @@ struct liste_chaine
   unsigned int rang;
   maillon racine;
   void (*copier)(void*,void**);
-  int (*val_exist)(void*,void*);
   void (*detruire)(void**);
-  int (*compare)(void*,void*);
+  int (*compare_val)(void*,void*);
 };
 
 
@@ -37,12 +36,11 @@ static maillon creer_maillon(void * _val,void (*copier)(void*,void**)){
   return mail;
 }
 
-chaine creer_chaine_init(void (*copier)(void*,void**),int (*val_exist)(void*,void*),void (*detruire)(void**),int (*compare)(void*,void*)){
+chaine creer_chaine_init(void (*copier)(void*,void**),void (*detruire)(void**),int (*compare_val)(void*,void*)){
   chaine chaine=malloc(sizeof(struct liste_chaine));
   chaine->copier=copier;
-  chaine->val_exist=val_exist;
   chaine->detruire=detruire;
-  chaine->compare=compare;
+  chaine->compare_val=compare_val;
   chaine->rang=0;
   chaine->racine=NULL;
   return chaine;
@@ -74,6 +72,22 @@ int compare_taille(chaine chaine1,chaine chaine2){
   }else{
     return 0;
   }
+}
+
+static int compare_val_maillon(maillon mail,void*val2,int(*compare)(void*val1,void*val2)){
+  return compare(mail->val,val2);
+}
+
+chaine val_exist(chaine ch, void* _val){
+  maillon courant=ch->racine;
+  while(courant!=NULL){
+    int test = compare_val_maillon(courant,_val,ch->compare_val);
+    if(test==0 ){
+      return ch;
+    }
+    courant=courant->next;
+  }
+  return NULL;
 }
 
 static void detruire_maillon_rec(maillon* maillon, void (*detruire)(void ** pt)){
