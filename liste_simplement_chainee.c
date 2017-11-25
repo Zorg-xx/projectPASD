@@ -128,6 +128,12 @@ void print_chaine(chaine chaine,FILE *out, void(*afficher)(void*_val,FILE *out))
   fprintf(out, "\n");
 }
 
+
+int compare_val(void *val1, void*val2, int(*compare)(void*v1,void*v2)){
+  
+  return compare(val1,val2);
+}
+
 /*----------fonction complémentaire pour les test--------------*/
 
 void getrang(chaine ch){

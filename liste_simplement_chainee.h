@@ -12,6 +12,8 @@ chaine fusion_chaine(chaine *ch1, chaine *ch2);
 void detruire_chaine_simple(chaine *chaine);
 int compare_taille(chaine chaine1,chaine chaine2);
 
+int compare_val(void *val1, void*val2, int(*compare)(void*v1,void*v2));
+
 /*----------fonction complémentaire pour les test--------------*/
 void getrang(chaine ch);
 

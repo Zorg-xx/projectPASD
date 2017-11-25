@@ -3,6 +3,9 @@
 
 #include "union_find.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 /*! \file kruskal.h
  * \brief Exécution de l'algorithme de Kruskal.
  *
@@ -15,3 +18,4 @@
  */
 
 #endif
+
