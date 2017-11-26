@@ -97,8 +97,6 @@ static void detruire_maillon_rec(maillon* maillon, void (*detruire)(void ** pt))
     }      
     detruire(&(*maillon)->val);
     detruire((void*) maillon);
-  }else{
-    printf("chaine deja vide");
   }
 }
 

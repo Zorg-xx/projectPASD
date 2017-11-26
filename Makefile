@@ -5,8 +5,9 @@ CC := gcc
 CFLAGS := -std=c99 -Wall -Wextra -pedantic -ggdb
 # Règle de compilation
 
-kruskal : union_find.o kruskal.o test_kruskal.o
-	$(CC) $(CFLAGS) -o $@ $^
+kruskal : liste_simplement_chainee.o union_find.o kruskal.o test_kruskal.o
+	$(CC) $(CFLAGS) -o $@ $^ 
+
 
 segmentation : pgm_img.o union_find.o segmentation.o test_segmentation.o
 	$(CC) $(CFLAGS) -o $@ $^

@@ -17,5 +17,17 @@
  * \version 2017
  */
 
+typedef struct kruskal *kruskal;
+typedef struct segment *segment;
+segment creer_segment(void * _valA,void * _valB,int _poid,void(*copier)(void *,void**),void (*detruire)(void**),int(*compare)(void*,void*));
+void afficher_segment(segment a,FILE *out,void (*afficher)(void*,FILE*));
+kruskal creer_kruskal(void (*copier)(void*,void**),void (*detruire)(void**),int (*compare)(void*,void*));
+void detruire_kruskal(kruskal *kru);
+void chargement_fichier(char* fileName,char* fileDest,void(*afficher)(void*,FILE*),kruskal kru);
+void afficher_arbre_complet(kruskal kru,FILE *out,void (*afficher)(void*,FILE*));
+void afficher_segment(segment a,FILE *out,void (*afficher)(void*,FILE*));
+void detruire_segment(segment *seg, void(*detruire)(void**));
+void afficher_arbre_min(kruskal kru,FILE *out,void (*afficher)(void*,FILE*));
+union_find get_union(kruskal kru);
 #endif
 

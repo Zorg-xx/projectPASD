@@ -57,29 +57,32 @@ void insert_sous_ensemble_dans_union(union_find unio,void* _val){
 void afficher_union(union_find unio, FILE *out,void(*afficher)(void* _val, FILE *f)){
   assert(unio!=NULL);
   sous_ensemble sous_ens=unio->root;
-  printf("affichage\n");
+  printf("affichage union(s)\n");
     while(sous_ens!=NULL){
       if(sous_ens->val!=NULL)
 	print_chaine(sous_ens->val,out,afficher);
       sous_ens=sous_ens->next;
     }
 }
-sous_ensemble trouve(union_find unio,void* _val){
-  assert(unio!=NULL);
-  sous_ensemble sous_ens=unio->root;
-  while(sous_ens!=NULL){
-    chaine test=NULL;
-    if(sous_ens->val!=NULL)
-    test=val_exist(sous_ens->val,_val);
-    if(test!=NULL){
-      return sous_ens;
+sous_ensemble trouver(union_find unio,void* _val){
+  if(unio!=NULL && unio->root!=NULL){
+    sous_ensemble sous_ens=unio->root;
+    while(sous_ens!=NULL){
+      chaine test=NULL;
+      if(sous_ens->val!=NULL)
+	test=val_exist(sous_ens->val,_val);
+      if(test!=NULL){
+	return sous_ens;
+      }
+      sous_ens=sous_ens->next;
     }
-    sous_ens=sous_ens->next;
+  }else{
+    printf("l'union est NULL\n");
   }
   return NULL;
 }
 
-void fusion(sous_ensemble ens1, sous_ensemble ens2){
+void unifier(sous_ensemble ens1, sous_ensemble ens2){
   fusion_chaine(&(ens1->val),&(ens2->val));
 }
 
@@ -95,7 +98,11 @@ static void destruction_ensemble_rec(sous_ensemble *sous_ens){
   }
 }
 void destruction_union(union_find *unio){
-  destruction_ensemble_rec(&(*unio)->root);
+  if(*unio!=NULL){
+    if((*unio)->root!=NULL){
+      destruction_ensemble_rec(&(*unio)->root);
+    }
   free(*unio);
+  }
 }
 
